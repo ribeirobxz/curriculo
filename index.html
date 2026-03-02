@@ -11,16 +11,17 @@
 </head>
 
 <body>
+    <canvas id="bg-canvas"></canvas>
     <main>
 
         <!--foto de perfil e nome-->
-        <section>
-            <img src="" alt="">
+        <section id="perfil">
+            <img src="./images/foto.jpg" alt="Foto de perfil">
             <h1>Kauã Ribeiro Neto</h1>
         </section>
 
         <!--Breve introdução á minha pessoa-->
-        <section>
+        <section id="informacoes-pessoais">
             <p>
                 Sou um entusiasta de tecnologia desde criança, principalmente por Desenvolvimento e Análise de Dados
                 <br>
@@ -55,12 +56,77 @@
         <!--Navbar das redes sociais-->
         <nav id="redes-sociais">
             <ol>
-                <li><a href="">Linkedin</a></li>
-                <li><a href="https://github.com/ribeirobxz">Github</a></li>
-                <li><a href="https://instagram.com/ribeirobxz">Instagram</a></li>
+                <li><a target="_blank" href="https://www.linkedin.com/in/kau%C3%A3-ribeiro-neto-737961251/">Linkedin</a></li>
+                <li><a target="_blank" href="https://github.com/ribeirobxz">Github</a></li>
+                <li><a target="_blank" href="https://instagram.com/ribeirobxz">Instagram</a></li>
             </ol>
         </nav>
     </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', () => { resize(); initParticles(); });
+
+        const PARTICLE_COUNT = 70;
+        const MAX_DIST = 140;
+        let particles = [];
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    r: Math.random() * 1.5 + 1
+                });
+            }
+        }
+        initParticles();
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 220, 180, 0.7)';
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const q = particles[j];
+                    const dx = p.x - q.x;
+                    const dy = p.y - q.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < MAX_DIST) {
+                        const alpha = 1 - dist / MAX_DIST;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(q.x, q.y);
+                        ctx.strokeStyle = `rgba(0, 200, 160, ${alpha * 0.35})`;
+                        ctx.lineWidth = 0.7;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
 </body>
 
 </html>
